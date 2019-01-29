@@ -1,5 +1,7 @@
 # oauth2-open-redirect-sample
 
+POC around https://github.com/spring-projects/spring-security-oauth/issues/1566
+
 ## 1) start app
 
 ```
